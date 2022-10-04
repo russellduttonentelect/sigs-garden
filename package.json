@@ -17,7 +17,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hexgrid": "^2.0.1",
-    "use-immer": "^0.7.0"
+    "use-immer": "^0.7.0",
+    "zustand": "^4.1.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
