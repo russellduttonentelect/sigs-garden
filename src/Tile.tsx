@@ -24,9 +24,18 @@ type TileProps = {
   remainingTiles: Set<string>;
   isSelected: boolean;
   selectTile: (hex: Hex) => void;
+  addTile: (hex: Hex) => void;
+  showNeighbourCount: boolean;
 };
 
-export const Tile = ({ hex, remainingTiles, isSelected, selectTile }: TileProps) => {
+export const Tile = ({
+  hex,
+  remainingTiles,
+  isSelected,
+  showNeighbourCount,
+  selectTile,
+  addTile,
+}: TileProps) => {
   const id = getID(hex);
   const hasRemaining = remainingTiles.has(id);
 
@@ -65,7 +74,11 @@ export const Tile = ({ hex, remainingTiles, isSelected, selectTile }: TileProps)
   }
 
   const onClick = () => {
-    selectTile(hex);
+    if (selectable) {
+      selectTile(hex);
+    } else {
+      addTile(hex);
+    }
   };
 
   return (
@@ -73,9 +86,9 @@ export const Tile = ({ hex, remainingTiles, isSelected, selectTile }: TileProps)
       {...hex}
       cellStyle={cellStyles}
       className={classNames({ selected: isSelected, available: selectable })}
-      onClick={selectable ? onClick : undefined}
+      onClick={onClick}
     >
-      <Text>{numNeighbours}</Text>
+      {showNeighbourCount && <Text>{numNeighbours}</Text>}
     </Hexagon>
   );
 };

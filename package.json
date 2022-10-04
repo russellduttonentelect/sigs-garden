@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
@@ -12,11 +12,13 @@
     "@emotion/react": "^11.10.4",
     "@mantine/core": "^5.5.0",
     "@mantine/hooks": "^5.5.0",
+    "@mantine/notifications": "^5.5.1",
     "classnames": "^2.3.2",
     "immer": "^9.0.15",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hexgrid": "^2.0.1",
+    "react-use": "^17.4.0",
     "use-immer": "^0.7.0",
     "zustand": "^4.1.1"
   },
