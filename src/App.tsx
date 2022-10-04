@@ -1,4 +1,4 @@
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useCallback, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 import {
@@ -12,8 +12,14 @@ import {
   Text,
 } from "react-hexgrid";
 import { createStyles } from "@mantine/core";
+import classNames from "classnames";
+import { useImmer } from "use-immer";
 
-const { getID } = HexUtils;
+import { enableMapSet } from "immer";
+
+enableMapSet();
+
+const { getID, add: hexAdd } = HexUtils;
 
 const RADIUS = 5;
 const useStyles = createStyles(() => ({
@@ -26,57 +32,118 @@ type TileProps = {
   hex: Hex;
 };
 
-const containsRemainingTile = (remaining: Hex[], coords: Hex) => {
-  return remaining.findIndex((current) => HexUtils.equals(current, coords)) >= 0;
-};
+const seedCoords = [
+  getID(new Hex(0, 0, 0)),
+  getID(new Hex(1, 0, -1)),
+  getID(new Hex(1, -1, 0)),
+  getID(new Hex(0, -1, 1)),
+  getID(new Hex(-1, 0, 1)),
+  getID(new Hex(-1, 1, 0)),
+  getID(new Hex(0, 1, -1)),
+  getID(new Hex(-2, 2, 0)),
+  getID(new Hex(-2, 0, 2)),
+  getID(new Hex(2, 0, -2)),
+  getID(new Hex(2, -1, -1)),
+];
+
+const hasOpposingNeighbours = (filledSet: Set<string>, hex: Hex) =>
+  HexUtils.DIRECTIONS.slice(0, 3).some(
+    (direction, index) =>
+      filledSet.has(getID(hexAdd(direction, hex))) &&
+      filledSet.has(getID(hexAdd(HexUtils.DIRECTIONS[index + 3], hex)))
+  );
+
+const hasTripleSplitNeighbours = (filledSet: Set<string>, hex: Hex) =>
+  HexUtils.DIRECTIONS.slice(0, 2).some(
+    (direction, index) =>
+      filledSet.has(getID(hexAdd(direction, hex))) &&
+      filledSet.has(getID(hexAdd(HexUtils.DIRECTIONS[index + 2], hex))) &&
+      filledSet.has(getID(hexAdd(HexUtils.DIRECTIONS[index + 4], hex)))
+  );
 
 const App = () => {
   const { classes } = useStyles();
-  const center: Hex = { q: 0, r: 0, s: 0 };
+  const [selectedTile, setSelectedTile] = useState("");
 
   const coordinates = GridGenerator.hexagon(RADIUS);
 
-  const remainingTiles = new Set();
+  const [remainingTiles, setRemainingTiles] = useImmer(new Set(seedCoords));
 
-  remainingTiles.add(getID(center));
-  remainingTiles.add(getID({ q: 1, r: -2, s: 1 }));
-  remainingTiles.add(getID({ q: -1, r: 2, s: 2 }));
-  remainingTiles.add(getID({ q: -1, r: -2, s: 3 }));
-  remainingTiles.add(getID({ q: 0, r: 2, s: -2 }));
-  remainingTiles.add(getID({ q: 1, r: 1, s: -2 }));
-  remainingTiles.add(getID({ q: 1, r: 2, s: -3 }));
-  remainingTiles.add(getID({ q: 2, r: 2, s: -4 }));
-  remainingTiles.add(getID({ q: 3, r: 2, s: -5 }));
-  remainingTiles.add(getID({ q: 2, r: -2, s: 0 }));
-  remainingTiles.add(getID({ q: -3, r: 2, s: 1 }));
-  remainingTiles.add(getID({ q: 0, r: -1, s: 1 }));
-  remainingTiles.add(getID({ q: -1, r: 0, s: 1 }));
+  const deleteTile = useCallback(
+    (id: string) =>
+      setRemainingTiles((draft) => {
+        draft.delete(id);
+      }),
+    []
+  );
+
+  const selectTile = (hex: Hex) => {
+    const hexId = getID(hex);
+    if (!selectedTile) {
+      setSelectedTile(hexId);
+      return;
+    }
+
+    if (selectedTile === hexId) {
+      setSelectedTile("");
+      return;
+    }
+
+    deleteTile(hexId);
+    deleteTile(selectedTile);
+    setSelectedTile("");
+  };
 
   const Tile = ({ hex }: TileProps) => {
-    const id = HexUtils.getID(hex);
+    const id = getID(hex);
     const hasRemaining = remainingTiles.has(id);
 
     let cellStyles: CSSProperties = {
-      fill: "#777",
+      fill: "#555",
     };
 
     if (hasRemaining) {
       cellStyles = {
         ...cellStyles,
-        fill: "#CCC",
+        fill: "#999",
       };
     }
-    const possibleNeighbours = HexUtils.neighbors(hex);
-    let emptyAdjacentTiles = 6;
-    possibleNeighbours.forEach((hex) => {
-      if (remainingTiles.has(getID(hex))) {
-        emptyAdjacentTiles--;
+
+    const neighbourCoords = HexUtils.neighbors(hex);
+    const filledNeighbours = neighbourCoords.filter((hex) => remainingTiles.has(getID(hex)));
+    const openNeighbours = neighbourCoords.filter((hex) => !remainingTiles.has(getID(hex)));
+    const numNeighbours = filledNeighbours.length;
+
+    let clearable = hasRemaining;
+    if (openNeighbours.length < 3) {
+      clearable = false;
+    }
+    if (openNeighbours.length < 5) {
+      const filledSet = new Set(filledNeighbours.map((neighbour) => getID(neighbour)));
+      if (hasOpposingNeighbours(filledSet, hex) || hasTripleSplitNeighbours(filledSet, hex)) {
+        clearable = false;
       }
-    });
+    }
+
+    if (clearable) {
+      cellStyles = {
+        ...cellStyles,
+        fill: "#DDD",
+      };
+    }
+
+    const onClick = () => {
+      selectTile(hex);
+    };
 
     return (
-      <Hexagon {...hex} cellStyle={cellStyles} className={hasRemaining ? "glow" : ""}>
-        <Text>{emptyAdjacentTiles}</Text>
+      <Hexagon
+        {...hex}
+        cellStyle={cellStyles}
+        className={classNames({ selected: selectedTile === id, available: clearable })}
+        onClick={clearable ? onClick : undefined}
+      >
+        <Text>{numNeighbours}</Text>
       </Hexagon>
     );
   };
