@@ -1,25 +1,15 @@
-import { CSSProperties, useCallback, useState } from "react";
-import reactLogo from "./assets/react.svg";
+import { useCallback, useState } from "react";
 import "./App.css";
-import {
-  GridGenerator,
-  Hexagon,
-  HexGrid,
-  Layout,
-  HexUtils,
-  Hex,
-  Pattern,
-  Text,
-} from "react-hexgrid";
-import { createStyles } from "@mantine/core";
-import classNames from "classnames";
+import { GridGenerator, HexGrid, Layout, HexUtils, Hex } from "react-hexgrid";
+import { Button, createStyles } from "@mantine/core";
 import { useImmer } from "use-immer";
 
 import { enableMapSet } from "immer";
+import { Tile } from "./Tile";
 
 enableMapSet();
 
-const { getID, add: hexAdd } = HexUtils;
+const { getID } = HexUtils;
 
 const RADIUS = 5;
 const useStyles = createStyles(() => ({
@@ -27,10 +17,6 @@ const useStyles = createStyles(() => ({
     rotate: "90deg",
   },
 }));
-
-type TileProps = {
-  hex: Hex;
-};
 
 const seedCoords = [
   getID(new Hex(0, 0, 0)),
@@ -45,21 +31,6 @@ const seedCoords = [
   getID(new Hex(2, 0, -2)),
   getID(new Hex(2, -1, -1)),
 ];
-
-const hasOpposingNeighbours = (filledSet: Set<string>, hex: Hex) =>
-  HexUtils.DIRECTIONS.slice(0, 3).some(
-    (direction, index) =>
-      filledSet.has(getID(hexAdd(direction, hex))) &&
-      filledSet.has(getID(hexAdd(HexUtils.DIRECTIONS[index + 3], hex)))
-  );
-
-const hasTripleSplitNeighbours = (filledSet: Set<string>, hex: Hex) =>
-  HexUtils.DIRECTIONS.slice(0, 2).some(
-    (direction, index) =>
-      filledSet.has(getID(hexAdd(direction, hex))) &&
-      filledSet.has(getID(hexAdd(HexUtils.DIRECTIONS[index + 2], hex))) &&
-      filledSet.has(getID(hexAdd(HexUtils.DIRECTIONS[index + 4], hex)))
-  );
 
 const App = () => {
   const { classes } = useStyles();
@@ -76,6 +47,8 @@ const App = () => {
       }),
     []
   );
+
+  const resetTiles = useCallback(() => setRemainingTiles(new Set(seedCoords)), []);
 
   const selectTile = (hex: Hex) => {
     const hexId = getID(hex);
@@ -94,62 +67,9 @@ const App = () => {
     setSelectedTile("");
   };
 
-  const Tile = ({ hex }: TileProps) => {
-    const id = getID(hex);
-    const hasRemaining = remainingTiles.has(id);
-
-    let cellStyles: CSSProperties = {
-      fill: "#555",
-    };
-
-    if (hasRemaining) {
-      cellStyles = {
-        ...cellStyles,
-        fill: "#999",
-      };
-    }
-
-    const neighbourCoords = HexUtils.neighbors(hex);
-    const filledNeighbours = neighbourCoords.filter((hex) => remainingTiles.has(getID(hex)));
-    const openNeighbours = neighbourCoords.filter((hex) => !remainingTiles.has(getID(hex)));
-    const numNeighbours = filledNeighbours.length;
-
-    let clearable = hasRemaining;
-    if (openNeighbours.length < 3) {
-      clearable = false;
-    }
-    if (openNeighbours.length < 5) {
-      const filledSet = new Set(filledNeighbours.map((neighbour) => getID(neighbour)));
-      if (hasOpposingNeighbours(filledSet, hex) || hasTripleSplitNeighbours(filledSet, hex)) {
-        clearable = false;
-      }
-    }
-
-    if (clearable) {
-      cellStyles = {
-        ...cellStyles,
-        fill: "#DDD",
-      };
-    }
-
-    const onClick = () => {
-      selectTile(hex);
-    };
-
-    return (
-      <Hexagon
-        {...hex}
-        cellStyle={cellStyles}
-        className={classNames({ selected: selectedTile === id, available: clearable })}
-        onClick={clearable ? onClick : undefined}
-      >
-        <Text>{numNeighbours}</Text>
-      </Hexagon>
-    );
-  };
-
   return (
     <div className="App">
+      <Button onClick={() => resetTiles()}>Reset</Button>
       <HexGrid width={1000} height={900}>
         <Layout
           size={{ x: 5, y: 5 }}
@@ -159,7 +79,13 @@ const App = () => {
           className={classes.grid}
         >
           {coordinates.map((hex) => (
-            <Tile hex={hex} key={HexUtils.getID(hex)} />
+            <Tile
+              hex={hex}
+              key={HexUtils.getID(hex)}
+              remainingTiles={remainingTiles}
+              isSelected={getID(hex) === selectedTile}
+              selectTile={selectTile}
+            />
           ))}
         </Layout>
       </HexGrid>
