@@ -6,7 +6,7 @@ type TileProps = {
   hex: Hex;
   containsTile: boolean;
   isSelected: boolean;
-  isSelectable: boolean;
+  isEdge: boolean;
   selectTile: (hex: Hex) => void;
 };
 
@@ -14,7 +14,7 @@ export const Tile = ({
   hex,
   containsTile,
   isSelected,
-  isSelectable,
+  isEdge,
   selectTile
 }: TileProps) => {
   let cellStyles: CSSProperties = {
@@ -25,31 +25,30 @@ export const Tile = ({
     cellStyles = {
       ...cellStyles,
       fill: '#C64',
-      filter: 'grayscale(50%)'
+      filter: 'grayscale(50%)',
+      strokeWidth: '0.1pt',
+      strokeLinejoin: 'round',
+      stroke: '#333'
     };
   }
 
-  if (isSelectable) {
+  if (isEdge) {
     cellStyles = {
       ...cellStyles,
       filter: 'none',
-      stroke: '#DDD',
-      strokeWidth: '0.1pt',
-      strokeLinejoin: 'round'
+      stroke: '#DDD'
     };
   }
 
   const onClick = () => {
-    if (isSelectable) {
-      selectTile(hex);
-    }
+    selectTile(hex);
   };
 
   return (
     <Hexagon
       {...hex}
       cellStyle={cellStyles}
-      className={classNames({ selected: isSelected, available: isSelectable })}
+      className={classNames({ selected: isSelected, available: isEdge })}
       onClick={onClick}
     />
   );

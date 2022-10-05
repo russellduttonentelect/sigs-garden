@@ -6,7 +6,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #232323;
+  background-color: #c0c0c0;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,17 +23,26 @@ body {
   min-height: 100vh;
 }
 
-#root {
+div#root {
   width: 100%;
+  min-height: 100%;
+  height: 100vh;
 }
 
 .grid {
-  height: 100%;
   min-height: 50px;
   max-height: 800px;
   display: flex;
   justify-content: center;
   flex-grow: 1;
+}
+
+.rotate {
+  rotate: 90deg;
+}
+
+.rotate-neg {
+  rotate: -90deg;
 }
 
 g.hexagon > text {

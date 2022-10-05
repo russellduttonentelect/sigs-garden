@@ -1,9 +1,16 @@
 import { Box, createStyles } from '@mantine/core';
 import { useElementSize } from '@mantine/hooks';
 import { ReactElement } from 'react';
-import { GridGenerator, Hex, HexGrid, HexUtils, Layout } from 'react-hexgrid';
+import {
+  GridGenerator,
+  Hex,
+  Hexagon,
+  HexGrid,
+  HexUtils,
+  Layout
+} from 'react-hexgrid';
+import { flatten, range } from 'lodash';
 
-const { getID } = HexUtils;
 const useStyles = createStyles(() => ({
   grid: {
     rotate: '90deg'
@@ -21,19 +28,48 @@ export const Board = ({ radius, renderTile }: BoardProps) => {
 
   const coordinates = GridGenerator.hexagon(radius);
 
+  const paletteCoords = flatten(
+    range(0, 2).map((q) => range(3, -4).map((r) => [q, r] as const))
+  );
+
   return (
-    <Box ref={ref} className="grid">
-      <HexGrid width={gridSize} height={gridSize}>
-        <Layout
-          size={{ x: 4.8, y: 4.8 }}
-          flat={true}
-          spacing={1.1}
-          origin={{ x: 0, y: 0 }}
-          className={classes.grid}
-        >
-          {coordinates.map(renderTile)}
-        </Layout>
-      </HexGrid>
+    <Box
+      ref={ref}
+      sx={{
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center'
+      }}
+      className={`${gridSize}`}
+    >
+      <Box>
+        <HexGrid width={gridSize} height={gridSize} viewBox="-50 -50 100 135">
+          <Layout
+            size={{ x: 5, y: 5 }}
+            flat={true}
+            spacing={1.1}
+            origin={{ x: 0, y: 0 }}
+            className="rotate"
+          >
+            {coordinates.map(renderTile)}
+          </Layout>
+          <Layout
+            size={{ x: 5, y: 5 }}
+            flat={true}
+            spacing={1.1}
+            origin={{ x: 65, y: 0 }}
+            className="rotate"
+          >
+            {paletteCoords.map(([q, r]) => (
+              <Hexagon
+                key={HexUtils.getID(new Hex(q, r, -q - r))}
+                {...new Hex(q, r, -q - r)}
+                cellStyle={{ fill: '#AAA' }}
+              />
+            ))}
+          </Layout>
+        </HexGrid>
+      </Box>
     </Box>
   );
 };

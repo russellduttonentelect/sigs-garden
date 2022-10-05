@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HexUtils, Hex } from 'react-hexgrid';
+import { HexUtils, Hex, HexGrid, Layout, Hexagon } from 'react-hexgrid';
 import { Box, Button, Container, Title } from '@mantine/core';
 import { Tile } from './Tile';
 import { useCoords } from './hooks/use-coords';
@@ -19,31 +19,33 @@ export const GameLogic = () => {
   const [, copyToClipboard] = useCopyToClipboard();
 
   const { placedTiles, deleteTile, resetPlacement, clearPlacement } =
-    usePlacedTiles(pattern1);
+    usePlacedTiles(pattern2);
 
   const selectTile = (hex: Hex) => {
-    const hexId = getID(hex);
-    if (!selectedTile) {
-      if (hexId === getID(new Hex(0, 0, 0))) {
-        deleteTile(hexId);
+    if (isEdge(hex)) {
+      const hexId = getID(hex);
+      if (!selectedTile) {
+        if (hexId === getID(new Hex(0, 0, 0))) {
+          deleteTile(hexId);
+          return;
+        }
+
+        setSelectedTile(hexId);
         return;
       }
 
-      setSelectedTile(hexId);
-      return;
-    }
+      if (selectedTile === hexId) {
+        setSelectedTile('');
+        return;
+      }
 
-    if (selectedTile === hexId) {
+      deleteTile(selectedTile);
+      deleteTile(hexId);
       setSelectedTile('');
-      return;
     }
-
-    deleteTile(selectedTile);
-    deleteTile(hexId);
-    setSelectedTile('');
   };
 
-  const isSelectable = (hex: Hex) => {
+  const isEdge = (hex: Hex) => {
     const id = getID(hex);
     const containsTile = placedTiles.hasOwnProperty(id);
 
@@ -82,9 +84,24 @@ export const GameLogic = () => {
   };
 
   return (
-    <Container fluid>
+    <Container
+      fluid
+      px={0}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        flexGrow: 1,
+        width: '100%'
+      }}
+    >
       <Box
-        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%'
+        }}
       >
         <Button.Group>
           <Button onClick={() => resetPlacement()}>Reseed</Button>
@@ -95,19 +112,28 @@ export const GameLogic = () => {
           Tiles Remaining: {Object.keys(placedTiles).length}
         </Title>
       </Box>
-      <Board
-        radius={RADIUS}
-        renderTile={(hex) => (
-          <Tile
-            hex={hex}
-            key={HexUtils.getID(hex)}
-            containsTile={placedTiles.hasOwnProperty(getID(hex))}
-            isSelected={getID(hex) === selectedTile}
-            selectTile={selectTile}
-            isSelectable={isSelectable(hex)}
-          />
-        )}
-      />
+      <Box
+        sx={{
+          display: 'flex',
+          width: '100%',
+          flexGrow: 1,
+          justifyContent: 'center'
+        }}
+      >
+        <Board
+          radius={RADIUS}
+          renderTile={(hex) => (
+            <Tile
+              hex={hex}
+              key={HexUtils.getID(hex)}
+              containsTile={placedTiles.hasOwnProperty(getID(hex))}
+              isSelected={getID(hex) === selectedTile}
+              selectTile={selectTile}
+              isEdge={isEdge(hex)}
+            />
+          )}
+        />
+      </Box>
     </Container>
   );
 };

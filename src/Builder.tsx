@@ -1,7 +1,7 @@
-import { Container, Box, Button, Title } from '@mantine/core';
+import { Container, Box, Button, Title, createStyles } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { useState } from 'react';
-import { Hex, HexUtils } from 'react-hexgrid';
+import { Hex, Hexagon, HexGrid, HexUtils, Layout } from 'react-hexgrid';
 import { useCopyToClipboard } from 'react-use';
 import { Board } from './Board';
 import { useCoords } from './hooks/use-coords';
@@ -10,39 +10,31 @@ import { Tile } from './Tile';
 import { hasOpposingNeighbours, hasTripleSplitNeighbours } from './util';
 
 const { getID } = HexUtils;
+const useStyles = createStyles(() => ({
+  grid: {
+    rotate: '90deg'
+  }
+}));
 
 const RADIUS = 5;
 
 export const Builder = () => {
-  const [selectedTile, setSelectedTile] = useState('');
+  const { classes } = useStyles();
   const [, copyToClipboard] = useCopyToClipboard();
 
-  const { placedTiles, deleteTile, resetPlacement, clearPlacement } =
+  const { placedTiles, addTile, deleteTile, resetPlacement, clearPlacement } =
     usePlacedTiles();
 
   const selectTile = (hex: Hex) => {
     const hexId = getID(hex);
-    if (!selectedTile) {
-      if (hexId === getID(new Hex(0, 0, 0))) {
-        deleteTile(hexId);
-        return;
-      }
-
-      setSelectedTile(hexId);
-      return;
+    if (placedTiles.hasOwnProperty(hexId)) {
+      deleteTile(hexId);
+    } else {
+      addTile(hexId, '');
     }
-
-    if (selectedTile === hexId) {
-      setSelectedTile('');
-      return;
-    }
-
-    deleteTile(selectedTile);
-    deleteTile(hexId);
-    setSelectedTile('');
   };
 
-  const isSelectable = (hex: Hex) => {
+  const isEdge = (hex: Hex) => {
     const id = getID(hex);
     const containsTile = placedTiles.hasOwnProperty(id);
 
@@ -73,7 +65,15 @@ export const Builder = () => {
   };
 
   const copyCoords = () => {
-    copyToClipboard(JSON.stringify(placedTiles));
+    const copyText =
+      '{' +
+      Object.entries(placedTiles).reduce((output, [key, value]) => {
+        const coords = key.split(',');
+        return `${output}[createCoord(${coords[0]}, ${coords[1]})]: "${value}",`;
+      }, '') +
+      '}';
+
+    copyToClipboard(copyText);
     showNotification({
       message: 'Copied to Clipboard!',
       autoClose: 3000
@@ -81,9 +81,24 @@ export const Builder = () => {
   };
 
   return (
-    <Container fluid>
+    <Container
+      fluid
+      px={0}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        flexGrow: 1,
+        width: '100%'
+      }}
+    >
       <Box
-        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%'
+        }}
       >
         <Button.Group>
           <Button onClick={() => resetPlacement()}>Reseed</Button>
@@ -94,19 +109,28 @@ export const Builder = () => {
           Tiles Remaining: {Object.keys(placedTiles).length}
         </Title>
       </Box>
-      <Board
-        radius={RADIUS}
-        renderTile={(hex) => (
-          <Tile
-            hex={hex}
-            key={HexUtils.getID(hex)}
-            containsTile={placedTiles.hasOwnProperty(getID(hex))}
-            isSelected={getID(hex) === selectedTile}
-            selectTile={selectTile}
-            isSelectable={isSelectable(hex)}
-          />
-        )}
-      />
+      <Box
+        sx={{
+          display: 'flex',
+          width: '100%',
+          flexGrow: 1,
+          justifyContent: 'center'
+        }}
+      >
+        <Board
+          radius={RADIUS}
+          renderTile={(hex) => (
+            <Tile
+              hex={hex}
+              key={HexUtils.getID(hex)}
+              containsTile={placedTiles.hasOwnProperty(getID(hex))}
+              isSelected={false}
+              selectTile={selectTile}
+              isEdge={isEdge(hex)}
+            />
+          )}
+        />
+      </Box>
     </Container>
   );
 };
