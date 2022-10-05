@@ -1,8 +1,6 @@
-import classNames from "classnames";
-import { CSSProperties } from "react";
-import { Hex, Hexagon, HexUtils, Text } from "react-hexgrid";
-
-const { getID } = HexUtils;
+import classNames from 'classnames';
+import { CSSProperties } from 'react';
+import { Hex, Hexagon } from 'react-hexgrid';
 
 type TileProps = {
   hex: Hex;
@@ -12,24 +10,32 @@ type TileProps = {
   selectTile: (hex: Hex) => void;
 };
 
-export const Tile = ({ hex, containsTile, isSelected, isSelectable, selectTile }: TileProps) => {
-  const id = getID(hex);
-
+export const Tile = ({
+  hex,
+  containsTile,
+  isSelected,
+  isSelectable,
+  selectTile
+}: TileProps) => {
   let cellStyles: CSSProperties = {
-    fill: "#555",
+    fill: '#555'
   };
 
   if (containsTile) {
     cellStyles = {
       ...cellStyles,
-      fill: "#999",
+      fill: '#C64',
+      filter: 'grayscale(50%)'
     };
   }
 
   if (isSelectable) {
     cellStyles = {
       ...cellStyles,
-      fill: "#DDD",
+      filter: 'none',
+      stroke: '#DDD',
+      strokeWidth: '0.1pt',
+      strokeLinejoin: 'round'
     };
   }
 
