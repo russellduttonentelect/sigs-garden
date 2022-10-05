@@ -114,7 +114,11 @@ export const Builder = () => {
           display: 'flex',
           width: '100%',
           flexGrow: 1,
-          justifyContent: 'center'
+          justifyContent: 'center',
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          border: '1pt solid #444',
+          backgroundColor: '#444'
         }}
       >
         <Board

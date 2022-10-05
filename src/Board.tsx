@@ -7,7 +7,8 @@ import {
   Hexagon,
   HexGrid,
   HexUtils,
-  Layout
+  Layout,
+  Pattern
 } from 'react-hexgrid';
 import { flatten, range } from 'lodash';
 

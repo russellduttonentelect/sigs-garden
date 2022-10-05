@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Hex, HexUtils } from 'react-hexgrid';
+import { Rune } from '../Rune.enum';
 
 const createCoord = (q: number, r: number) =>
   HexUtils.getID(new Hex(q, r, -q - r));
@@ -64,7 +65,7 @@ export const useCoords = () => {
   });
 
   const [pattern2] = useState({
-    [createCoord(0, 0)]: '',
+    [createCoord(0, 0)]: Rune.Titanium,
     [createCoord(-5, 5)]: '',
     [createCoord(-4, 5)]: '',
     [createCoord(-3, 5)]: '',
