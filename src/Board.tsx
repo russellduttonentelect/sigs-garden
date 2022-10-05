@@ -11,6 +11,8 @@ import {
   Pattern
 } from 'react-hexgrid';
 import { flatten, range } from 'lodash';
+import { Rune } from './Rune.enum';
+import { RuneIcon } from './RuneIcon';
 
 const useStyles = createStyles(() => ({
   grid: {
@@ -29,10 +31,6 @@ export const Board = ({ radius, renderTile }: BoardProps) => {
 
   const coordinates = GridGenerator.hexagon(radius);
 
-  const paletteCoords = flatten(
-    range(0, 2).map((q) => range(3, -4).map((r) => [q, r] as const))
-  );
-
   return (
     <Box
       ref={ref}
@@ -41,36 +39,19 @@ export const Board = ({ radius, renderTile }: BoardProps) => {
         display: 'flex',
         justifyContent: 'center'
       }}
-      className={`${gridSize}`}
     >
-      <Box>
-        <HexGrid width={gridSize} height={gridSize} viewBox="-50 -50 100 135">
-          <Layout
-            size={{ x: 5, y: 5 }}
-            flat={true}
-            spacing={1.1}
-            origin={{ x: 0, y: 0 }}
-            className="rotate"
-          >
-            {coordinates.map(renderTile)}
-          </Layout>
-          <Layout
-            size={{ x: 5, y: 5 }}
-            flat={true}
-            spacing={1.1}
-            origin={{ x: 65, y: 0 }}
-            className="rotate"
-          >
-            {paletteCoords.map(([q, r]) => (
-              <Hexagon
-                key={HexUtils.getID(new Hex(q, r, -q - r))}
-                {...new Hex(q, r, -q - r)}
-                cellStyle={{ fill: '#AAA' }}
-              />
-            ))}
-          </Layout>
-        </HexGrid>
-      </Box>
+      <HexGrid width={gridSize} height={gridSize} viewBox="-50 -50 100 100">
+        <Layout
+          size={{ x: 5, y: 5 }}
+          flat={true}
+          spacing={1.1}
+          origin={{ x: 0, y: 0 }}
+          className="rotate"
+        >
+          {coordinates.map(renderTile)}
+        </Layout>
+        <RuneIcon rune={Rune.Air} />
+      </HexGrid>
     </Box>
   );
 };

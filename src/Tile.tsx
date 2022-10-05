@@ -4,6 +4,7 @@ import { Children, CSSProperties, FC, PropsWithChildren } from 'react';
 import { Hex, Hexagon, Text } from 'react-hexgrid';
 import { IconPhoto } from '@tabler/icons';
 import { Rune } from './Rune.enum';
+import { RuneIcon } from './RuneIcon';
 
 type TileProps = {
   hex: Hex;
@@ -11,26 +12,6 @@ type TileProps = {
   isSelected: boolean;
   isEdge: boolean;
   selectTile: (hex: Hex) => void;
-};
-
-const Icon = ({ children }: PropsWithChildren) => {
-  return (
-    <ThemeIcon
-      radius="lg"
-      variant="gradient"
-      gradient={{ from: 'indigo', to: 'cyan' }}
-    >
-      {children}
-    </ThemeIcon>
-  );
-};
-
-const iconLookup = {
-  [Rune.Earth]: (
-    <Icon>
-      <IconPhoto />
-    </Icon>
-  )
 };
 
 export const Tile = ({
@@ -47,7 +28,7 @@ export const Tile = ({
   if (containsTile) {
     cellStyles = {
       ...cellStyles,
-      fill: '#C64',
+      fill: '#3e71b5',
       filter: 'grayscale(50%)',
       strokeWidth: '0.1pt',
       strokeLinejoin: 'round',
@@ -73,10 +54,7 @@ export const Tile = ({
       cellStyle={cellStyles}
       className={classNames({ selected: isSelected, available: isEdge })}
       onClick={onClick}
-    >
-      <Icon>
-        <IconPhoto />
-      </Icon>
-    </Hexagon>
+      fill="Air"
+    />
   );
 };
