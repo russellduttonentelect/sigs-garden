@@ -1,0 +1,16 @@
+export enum Rune {
+  Fire = "Fire",
+  Water = "Water",
+  Earth = "Earth",
+  Air = "Air",
+  Elemental = "Elemental",
+  Light = "Light",
+  Shadow = "Shadow",
+  Magnesium = "Magnesium",
+  Iron = "Iron",
+  Copper = "Copper",
+  Zinc = "Zinc",
+  Platinum = "Platinum",
+  Titanium = "Titanium",
+  Quicksilver = "Quicksilver",
+}

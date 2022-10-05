@@ -2,71 +2,31 @@ import classNames from "classnames";
 import { CSSProperties } from "react";
 import { Hex, Hexagon, HexUtils, Text } from "react-hexgrid";
 
-const { getID, add: hexAdd } = HexUtils;
-
-const hasOpposingNeighbours = (filledSet: Set<string>, hex: Hex) =>
-  HexUtils.DIRECTIONS.slice(0, 3).some(
-    (direction, index) =>
-      filledSet.has(getID(hexAdd(direction, hex))) &&
-      filledSet.has(getID(hexAdd(HexUtils.DIRECTIONS[index + 3], hex)))
-  );
-
-const hasTripleSplitNeighbours = (filledSet: Set<string>, hex: Hex) =>
-  HexUtils.DIRECTIONS.slice(0, 2).some(
-    (direction, index) =>
-      filledSet.has(getID(hexAdd(direction, hex))) &&
-      filledSet.has(getID(hexAdd(HexUtils.DIRECTIONS[index + 2], hex))) &&
-      filledSet.has(getID(hexAdd(HexUtils.DIRECTIONS[index + 4], hex)))
-  );
+const { getID } = HexUtils;
 
 type TileProps = {
   hex: Hex;
-  remainingTiles: Set<string>;
+  containsTile: boolean;
   isSelected: boolean;
+  isSelectable: boolean;
   selectTile: (hex: Hex) => void;
-  addTile: (hex: Hex) => void;
-  showNeighbourCount: boolean;
 };
 
-export const Tile = ({
-  hex,
-  remainingTiles,
-  isSelected,
-  showNeighbourCount,
-  selectTile,
-  addTile,
-}: TileProps) => {
+export const Tile = ({ hex, containsTile, isSelected, isSelectable, selectTile }: TileProps) => {
   const id = getID(hex);
-  const hasRemaining = remainingTiles.has(id);
 
   let cellStyles: CSSProperties = {
     fill: "#555",
   };
 
-  if (hasRemaining) {
+  if (containsTile) {
     cellStyles = {
       ...cellStyles,
       fill: "#999",
     };
   }
 
-  const neighbourCoords = HexUtils.neighbors(hex);
-  const filledNeighbours = neighbourCoords.filter((hex) => remainingTiles.has(getID(hex)));
-  const openNeighbours = neighbourCoords.filter((hex) => !remainingTiles.has(getID(hex)));
-  const numNeighbours = filledNeighbours.length;
-
-  let selectable = hasRemaining;
-  if (openNeighbours.length < 3) {
-    selectable = false;
-  }
-  if (openNeighbours.length < 5) {
-    const filledSet = new Set(filledNeighbours.map((neighbour) => getID(neighbour)));
-    if (hasOpposingNeighbours(filledSet, hex) || hasTripleSplitNeighbours(filledSet, hex)) {
-      selectable = false;
-    }
-  }
-
-  if (selectable) {
+  if (isSelectable) {
     cellStyles = {
       ...cellStyles,
       fill: "#DDD",
@@ -74,10 +34,8 @@ export const Tile = ({
   }
 
   const onClick = () => {
-    if (selectable) {
+    if (isSelectable) {
       selectTile(hex);
-    } else {
-      addTile(hex);
     }
   };
 
@@ -85,10 +43,8 @@ export const Tile = ({
     <Hexagon
       {...hex}
       cellStyle={cellStyles}
-      className={classNames({ selected: isSelected, available: selectable })}
+      className={classNames({ selected: isSelected, available: isSelectable })}
       onClick={onClick}
-    >
-      {showNeighbourCount && <Text>{numNeighbours}</Text>}
-    </Hexagon>
+    />
   );
 };
