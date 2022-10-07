@@ -10,10 +10,10 @@ import { showNotification } from '@mantine/notifications';
 import { Hex, HexUtils } from 'react-hexgrid';
 import { useCopyToClipboard } from 'react-use';
 import { Board } from './Board';
+import { Tile } from './components/Tile';
 import { useCoords } from './hooks/use-coords';
 import { usePlacedTiles } from './hooks/use-placed-tiles';
 import { Rune } from './Rune.enum';
-import { Tile } from './Tile';
 import { hasOpposingNeighbours, hasTripleSplitNeighbours } from './util';
 
 const { getID } = HexUtils;

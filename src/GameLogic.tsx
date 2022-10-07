@@ -11,12 +11,12 @@ import { useState } from 'react';
 import { Hex, HexUtils } from 'react-hexgrid';
 import { useCopyToClipboard } from 'react-use';
 import { Board } from './Board';
-import { GridIcon } from './GridIcon';
+import { GridIcon } from './components/GridIcon';
+import { MantineIcon } from './components/MantineIcon';
+import { Tile } from './components/Tile';
 import { useCoords } from './hooks/use-coords';
 import { usePlacedTiles } from './hooks/use-placed-tiles';
-import { MantineIcon } from './MantineIcon';
 import { Rune } from './Rune.enum';
-import { Tile } from './Tile';
 import { hasOpposingNeighbours, hasTripleSplitNeighbours } from './util';
 
 const { getID } = HexUtils;

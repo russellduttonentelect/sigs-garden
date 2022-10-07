@@ -1,6 +1,6 @@
 import { Hex, HexUtils } from 'react-hexgrid';
 import { useLayoutContext } from 'react-hexgrid/lib/Layout';
-import { Rune } from './Rune.enum';
+import { Rune } from '../Rune.enum';
 import { RuneIcon } from './RuneIcon';
 
 type GridIconProps = {

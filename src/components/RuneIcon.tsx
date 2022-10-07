@@ -1,21 +1,21 @@
-import { Rune } from './Rune.enum';
 import {
-  IconPlant,
+  Icon3dCubeSphere,
   IconDroplet,
   IconFlame,
-  IconRipple,
-  Icon3dCubeSphere,
-  IconSun,
-  IconMoon,
   IconLayoutAlignBottom,
+  IconLetterT,
+  IconMoon,
+  IconPlant,
+  IconRipple,
+  IconSun,
   IconTallymark1,
   IconTallymark2,
   IconTallymark3,
   IconTallymark4,
-  IconTallymarks,
-  IconLetterT
+  IconTallymarks
 } from '@tabler/icons';
 import { get } from 'lodash';
+import { Rune } from '../Rune.enum';
 
 type RuneIconProps = {
   rune: Rune;

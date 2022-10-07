@@ -1,7 +1,7 @@
 import { ThemeIcon } from '@mantine/core';
-import { Rune } from './Rune.enum';
-import { RuneIcon } from './RuneIcon';
 import { get } from 'lodash';
+import { Rune } from '../Rune.enum';
+import { RuneIcon } from './RuneIcon';
 
 type MantineIconProps = {
   rune: Rune;
