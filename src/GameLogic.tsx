@@ -34,7 +34,8 @@ export const GameLogic = () => {
     deleteTile,
     resetPlacement,
     clearPlacement,
-    getTileType
+    getTileType,
+    coordToHex
   } = usePlacedTiles(pattern2);
 
   const selectTile = (hex: Hex) => {
@@ -192,9 +193,17 @@ export const GameLogic = () => {
             />
           )}
         >
-          <g>
-            <GridIcon rune={Rune.Titanium} size={6} x={0} y={0} />
-          </g>
+          {Object.keys(placedTiles).map((coord) => {
+            const hex = coordToHex(coord);
+            return (
+              <GridIcon
+                onClick={() => selectTile(hex)}
+                rune={getTileType(coord) as Rune}
+                size={6}
+                hex={hex}
+              />
+            );
+          })}
         </Board>
         <Stack sx={{ padding: 4 }}>
           {Object.values(Rune).map((rune, index) => (

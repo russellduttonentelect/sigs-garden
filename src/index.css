@@ -41,6 +41,6 @@ g.hexagon-group.selected {
   filter: drop-shadow(0px 0px 0.35px hsla(0, 0%, 100%, 0.9));
 }
 
-g.hexagon-group.available {
+g .available {
   cursor: pointer;
 }

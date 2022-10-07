@@ -36,12 +36,19 @@ export const usePlacedTiles = (placement: Record<string, string> = {}) => {
     return placedTiles[lookup];
   };
 
+  const coordToHex = (coord: string) => {
+    const [q, r, s] = coord.split(',');
+
+    return new Hex(Number(q), Number(r), Number(s));
+  };
+
   return {
     placedTiles,
     addTile,
     deleteTile,
     resetPlacement,
     clearPlacement,
-    getTileType
+    getTileType,
+    coordToHex
   };
 };

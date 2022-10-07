@@ -20,14 +20,14 @@ export const Tile = ({
   selectTile
 }: TileProps) => {
   let cellStyles: CSSProperties = {
-    fill: '#555'
+    fill: '#626262'
   };
 
   if (containsTile) {
     cellStyles = {
       ...cellStyles,
       fill: fill,
-      filter: 'contrast(30%)',
+      filter: 'brightness(35%)',
       strokeWidth: '0.1pt',
       strokeLinejoin: 'round',
       stroke: '#333'

@@ -11,6 +11,11 @@ const useStyles = createStyles(() => ({
 type BoardProps = {
   radius: number;
   renderTile: (hex: Hex) => ReactElement;
+  children:
+    | React.ReactElement
+    | React.ReactElement[]
+    | JSX.Element
+    | JSX.Element[];
 };
 
 export const Board = ({
@@ -43,7 +48,15 @@ export const Board = ({
         >
           {coordinates.map(renderTile)}
         </Layout>
-        {children}
+        <Layout
+          size={{ x: 5, y: 5 }}
+          flat={false}
+          spacing={1.1}
+          origin={{ x: 0, y: 0 }}
+          className="rotate"
+        >
+          {children}
+        </Layout>
       </HexGrid>
     </Box>
   );
