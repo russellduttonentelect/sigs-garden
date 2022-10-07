@@ -1,4 +1,4 @@
-import { HexUtils, Hex } from "react-hexgrid";
+import { HexUtils, Hex } from 'react-hexgrid';
 
 const { DIRECTIONS, getID, add: hexAdd } = HexUtils;
 

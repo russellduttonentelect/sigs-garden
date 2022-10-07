@@ -1,16 +1,13 @@
-import { ThemeIcon } from '@mantine/core';
 import classNames from 'classnames';
-import { Children, CSSProperties, FC, PropsWithChildren } from 'react';
-import { Hex, Hexagon, Text } from 'react-hexgrid';
-import { IconPhoto } from '@tabler/icons';
-import { Rune } from './Rune.enum';
-import { RuneIcon } from './RuneIcon';
+import { CSSProperties } from 'react';
+import { Hex, Hexagon } from 'react-hexgrid';
 
 type TileProps = {
   hex: Hex;
   containsTile: boolean;
   isSelected: boolean;
   isEdge: boolean;
+  fill: string;
   selectTile: (hex: Hex) => void;
 };
 
@@ -19,6 +16,7 @@ export const Tile = ({
   containsTile,
   isSelected,
   isEdge,
+  fill,
   selectTile
 }: TileProps) => {
   let cellStyles: CSSProperties = {
@@ -28,8 +26,8 @@ export const Tile = ({
   if (containsTile) {
     cellStyles = {
       ...cellStyles,
-      fill: '#3e71b5',
-      filter: 'grayscale(50%)',
+      fill: fill,
+      filter: 'contrast(30%)',
       strokeWidth: '0.1pt',
       strokeLinejoin: 'round',
       stroke: '#333'
@@ -54,7 +52,6 @@ export const Tile = ({
       cellStyle={cellStyles}
       className={classNames({ selected: isSelected, available: isEdge })}
       onClick={onClick}
-      fill="Air"
     />
   );
 };

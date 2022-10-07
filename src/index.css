@@ -37,18 +37,6 @@ div#root {
   flex-grow: 1;
 }
 
-.rotate {
-  rotate: 90deg;
-}
-
-.rotate-neg {
-  rotate: -90deg;
-}
-
-g.hexagon > text {
-  rotate: -90deg;
-}
-
 g.hexagon-group.selected {
   filter: drop-shadow(0px 0px 0.35px hsla(0, 0%, 100%, 0.9));
 }

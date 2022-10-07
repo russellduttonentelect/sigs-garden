@@ -1,16 +1,23 @@
-import { PropsWithChildren, useState } from 'react';
-import { HexUtils, Hex, HexGrid, Layout, Hexagon } from 'react-hexgrid';
-import { Box, Button, Container, Stack, ThemeIcon, Title } from '@mantine/core';
-import { Tile } from './Tile';
-import { useCoords } from './hooks/use-coords';
-import { useCopyToClipboard } from 'react-use';
+import {
+  Box,
+  Button,
+  Container,
+  Stack,
+  Title,
+  useMantineTheme
+} from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { hasOpposingNeighbours, hasTripleSplitNeighbours } from './util';
-import { usePlacedTiles } from './hooks/use-placed-tiles';
+import { useState } from 'react';
+import { Hex, HexUtils } from 'react-hexgrid';
+import { useCopyToClipboard } from 'react-use';
 import { Board } from './Board';
+import { GridIcon } from './GridIcon';
+import { useCoords } from './hooks/use-coords';
+import { usePlacedTiles } from './hooks/use-placed-tiles';
+import { MantineIcon } from './MantineIcon';
 import { Rune } from './Rune.enum';
-import { get } from 'lodash';
-import { RuneIcon } from './RuneIcon';
+import { Tile } from './Tile';
+import { hasOpposingNeighbours, hasTripleSplitNeighbours } from './util';
 
 const { getID } = HexUtils;
 
@@ -20,9 +27,15 @@ export const GameLogic = () => {
   const [selectedTile, setSelectedTile] = useState('');
   const { pattern1, pattern2 } = useCoords();
   const [, copyToClipboard] = useCopyToClipboard();
+  const theme = useMantineTheme();
 
-  const { placedTiles, deleteTile, resetPlacement, clearPlacement } =
-    usePlacedTiles(pattern2);
+  const {
+    placedTiles,
+    deleteTile,
+    resetPlacement,
+    clearPlacement,
+    getTileType
+  } = usePlacedTiles(pattern2);
 
   const selectTile = (hex: Hex) => {
     if (isEdge(hex)) {
@@ -36,6 +49,8 @@ export const GameLogic = () => {
         setSelectedTile(hexId);
         return;
       }
+
+      const selectedType = getTileType(hex);
 
       if (selectedTile === hexId) {
         setSelectedTile('');
@@ -76,6 +91,42 @@ export const GameLogic = () => {
     }
 
     return containsTile;
+  };
+
+  const getTileFill = (hex: Hex) => {
+    const tile = getTileType(hex);
+    switch (tile) {
+      case Rune.Air:
+        return theme.colors.indigo[5];
+      case Rune.Water:
+        return theme.colors.blue[5];
+      case Rune.Fire:
+        return theme.colors.red[5];
+      case Rune.Earth:
+        return theme.colors.lime[5];
+      case Rune.Elemental:
+        return '#B88';
+      case Rune.Light:
+        return '#ffffaa';
+      case Rune.Shadow:
+        return '#333';
+      case Rune.Quicksilver:
+        return '#597e8d';
+      case Rune.Magnesium:
+        return '#9a9ea3';
+      case Rune.Iron:
+        return '#625e59';
+      case Rune.Copper:
+        return '#B77333';
+      case Rune.Zinc:
+        return '#4c4c49';
+      case Rune.Platinum:
+        return '#95978e';
+      case Rune.Titanium:
+        return '#95978e';
+      default:
+        return '#666';
+    }
   };
 
   const copyCoords = () => {
@@ -137,9 +188,14 @@ export const GameLogic = () => {
               isSelected={getID(hex) === selectedTile}
               selectTile={selectTile}
               isEdge={isEdge(hex)}
+              fill={getTileFill(hex)}
             />
           )}
-        />
+        >
+          <g>
+            <GridIcon rune={Rune.Titanium} size={6} x={0} y={0} />
+          </g>
+        </Board>
         <Stack sx={{ padding: 4 }}>
           {Object.values(Rune).map((rune, index) => (
             <Box
@@ -153,7 +209,7 @@ export const GameLogic = () => {
                 borderRadius: '40px'
               }}
             >
-              <RuneIcon rune={rune} />
+              <MantineIcon rune={rune} />
               <Title order={4} color="black" sx={{ paddingRight: 8 }}>
                 1
               </Title>

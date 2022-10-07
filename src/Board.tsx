@@ -1,18 +1,7 @@
 import { Box, createStyles } from '@mantine/core';
 import { useElementSize } from '@mantine/hooks';
-import { ReactElement } from 'react';
-import {
-  GridGenerator,
-  Hex,
-  Hexagon,
-  HexGrid,
-  HexUtils,
-  Layout,
-  Pattern
-} from 'react-hexgrid';
-import { flatten, range } from 'lodash';
-import { Rune } from './Rune.enum';
-import { RuneIcon } from './RuneIcon';
+import { PropsWithChildren, ReactElement } from 'react';
+import { GridGenerator, Hex, HexGrid, Layout } from 'react-hexgrid';
 
 const useStyles = createStyles(() => ({
   grid: {
@@ -24,7 +13,11 @@ type BoardProps = {
   renderTile: (hex: Hex) => ReactElement;
 };
 
-export const Board = ({ radius, renderTile }: BoardProps) => {
+export const Board = ({
+  radius,
+  renderTile,
+  children
+}: PropsWithChildren<BoardProps>) => {
   const { classes } = useStyles();
   const { ref, width, height } = useElementSize();
   const gridSize = Math.min(width, height);
@@ -43,14 +36,14 @@ export const Board = ({ radius, renderTile }: BoardProps) => {
       <HexGrid width={gridSize} height={gridSize} viewBox="-50 -50 100 100">
         <Layout
           size={{ x: 5, y: 5 }}
-          flat={true}
+          flat={false}
           spacing={1.1}
           origin={{ x: 0, y: 0 }}
           className="rotate"
         >
           {coordinates.map(renderTile)}
         </Layout>
-        <RuneIcon rune={Rune.Air} />
+        {children}
       </HexGrid>
     </Box>
   );

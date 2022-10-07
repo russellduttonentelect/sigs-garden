@@ -1,11 +1,18 @@
-import { Container, Box, Button, Title, createStyles } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Container,
+  createStyles,
+  Title,
+  useMantineTheme
+} from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { useState } from 'react';
-import { Hex, Hexagon, HexGrid, HexUtils, Layout } from 'react-hexgrid';
+import { Hex, HexUtils } from 'react-hexgrid';
 import { useCopyToClipboard } from 'react-use';
 import { Board } from './Board';
 import { useCoords } from './hooks/use-coords';
 import { usePlacedTiles } from './hooks/use-placed-tiles';
+import { Rune } from './Rune.enum';
 import { Tile } from './Tile';
 import { hasOpposingNeighbours, hasTripleSplitNeighbours } from './util';
 
@@ -20,10 +27,18 @@ const RADIUS = 5;
 
 export const Builder = () => {
   const { classes } = useStyles();
+  const { pattern1, pattern2 } = useCoords();
   const [, copyToClipboard] = useCopyToClipboard();
+  const theme = useMantineTheme();
 
-  const { placedTiles, addTile, deleteTile, resetPlacement, clearPlacement } =
-    usePlacedTiles();
+  const {
+    placedTiles,
+    addTile,
+    deleteTile,
+    resetPlacement,
+    clearPlacement,
+    getTileType
+  } = usePlacedTiles();
 
   const selectTile = (hex: Hex) => {
     const hexId = getID(hex);
@@ -62,6 +77,42 @@ export const Builder = () => {
     }
 
     return containsTile;
+  };
+
+  const getTileFill = (hex: Hex) => {
+    const tile = getTileType(hex);
+    switch (tile) {
+      case Rune.Air:
+        return theme.colors.indigo[5];
+      case Rune.Water:
+        return theme.colors.blue[5];
+      case Rune.Fire:
+        return theme.colors.red[5];
+      case Rune.Earth:
+        return theme.colors.lime[5];
+      case Rune.Elemental:
+        return '#B88';
+      case Rune.Light:
+        return '#ffffaa';
+      case Rune.Shadow:
+        return '#333';
+      case Rune.Quicksilver:
+        return '#597e8d';
+      case Rune.Magnesium:
+        return '#9a9ea3';
+      case Rune.Iron:
+        return '#625e59';
+      case Rune.Copper:
+        return '#B77333';
+      case Rune.Zinc:
+        return '#4c4c49';
+      case Rune.Platinum:
+        return '#95978e';
+      case Rune.Titanium:
+        return '#95978e';
+      default:
+        return '#666';
+    }
   };
 
   const copyCoords = () => {
@@ -131,6 +182,7 @@ export const Builder = () => {
               isSelected={false}
               selectTile={selectTile}
               isEdge={isEdge(hex)}
+              fill={getTileFill(hex)}
             />
           )}
         />

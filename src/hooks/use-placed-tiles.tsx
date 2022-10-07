@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { Hex, HexUtils } from 'react-hexgrid';
 import { useImmer } from 'use-immer';
 
 export const usePlacedTiles = (placement: Record<string, string> = {}) => {
@@ -26,5 +27,21 @@ export const usePlacedTiles = (placement: Record<string, string> = {}) => {
     setPlacedTiles({});
   }, []);
 
-  return { placedTiles, addTile, deleteTile, resetPlacement, clearPlacement };
+  const getTileType = (hex: Hex | string) => {
+    const lookup = typeof hex === 'string' ? hex : HexUtils.getID(hex);
+    if (!placedTiles.hasOwnProperty(lookup)) {
+      return '';
+    }
+
+    return placedTiles[lookup];
+  };
+
+  return {
+    placedTiles,
+    addTile,
+    deleteTile,
+    resetPlacement,
+    clearPlacement,
+    getTileType
+  };
 };
