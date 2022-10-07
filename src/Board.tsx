@@ -57,6 +57,15 @@ export const Board = ({
         >
           {children}
         </Layout>
+        <filter id="shadow">
+          <feDropShadow
+            dx="1"
+            dy="1"
+            stdDeviation="1"
+            floodColor="#000000"
+            floodOpacity="0.7"
+          />
+        </filter>
       </HexGrid>
     </Box>
   );

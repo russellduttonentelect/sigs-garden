@@ -24,20 +24,22 @@ type RuneIconProps = {
 
 export const RuneIcon = ({ rune, size }: RuneIconProps) => {
   const iconLookup = {
-    [Rune.Earth]: <IconPlant size={size} />,
-    [Rune.Water]: <IconDroplet size={size} />,
-    [Rune.Fire]: <IconFlame size={size} />,
-    [Rune.Air]: <IconRipple size={size} />,
-    [Rune.Elemental]: <Icon3dCubeSphere size={size} />,
-    [Rune.Light]: <IconSun size={size} />,
-    [Rune.Shadow]: <IconMoon size={size} />,
-    [Rune.Quicksilver]: <IconLayoutAlignBottom size={size} />,
-    [Rune.Magnesium]: <IconTallymark1 size={size} />,
-    [Rune.Iron]: <IconTallymark2 size={size} />,
-    [Rune.Copper]: <IconTallymark3 size={size} />,
-    [Rune.Zinc]: <IconTallymark4 size={size} />,
-    [Rune.Platinum]: <IconTallymarks size={size} />,
-    [Rune.Titanium]: <IconLetterT size={size} />
+    [Rune.Earth]: <IconPlant size={size} filter="url(#shadow)" />,
+    [Rune.Water]: <IconDroplet size={size} filter="url(#shadow)" />,
+    [Rune.Fire]: <IconFlame size={size} filter="url(#shadow)" />,
+    [Rune.Air]: <IconRipple size={size} filter="url(#shadow)" />,
+    [Rune.Elemental]: <Icon3dCubeSphere size={size} filter="url(#shadow)" />,
+    [Rune.Light]: <IconSun size={size} filter="url(#shadow)" />,
+    [Rune.Shadow]: <IconMoon size={size} filter="url(#shadow)" />,
+    [Rune.Quicksilver]: (
+      <IconLayoutAlignBottom size={size} filter="url(#shadow)" />
+    ),
+    [Rune.Magnesium]: <IconTallymark1 size={size} filter="url(#shadow)" />,
+    [Rune.Iron]: <IconTallymark2 size={size} filter="url(#shadow)" />,
+    [Rune.Copper]: <IconTallymark3 size={size} filter="url(#shadow)" />,
+    [Rune.Zinc]: <IconTallymark4 size={size} filter="url(#shadow)" />,
+    [Rune.Platinum]: <IconTallymarks size={size} filter="url(#shadow)" />,
+    [Rune.Titanium]: <IconLetterT size={size} filter="url(#shadow)" />
   };
 
   return get(iconLookup, rune);
