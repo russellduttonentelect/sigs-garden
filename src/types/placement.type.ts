@@ -1,1 +1,3 @@
-export type Placement = Record<string, string>;
+import { Rune } from '../Rune.enum';
+
+export type Placement = Record<string, Rune>;

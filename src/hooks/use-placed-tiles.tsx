@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
 import { Hex, HexUtils } from 'react-hexgrid';
 import { useImmer } from 'use-immer';
+import { Placement } from '../types/placement.type';
 
-export const usePlacedTiles = (placement: Record<string, string> = {}) => {
+export const usePlacedTiles = (placement: Placement = {}) => {
   const [placedTiles, setPlacedTiles] = useImmer(placement);
 
   const deleteTile = useCallback(
@@ -13,11 +14,14 @@ export const usePlacedTiles = (placement: Record<string, string> = {}) => {
     []
   );
 
-  const addTile = useCallback((coord: string, type: string) => {
-    setPlacedTiles((draft) => {
-      draft[coord] = type;
-    });
-  }, []);
+  const addTile = useCallback(
+    (coord: keyof Placement, type: Placement[number]) => {
+      setPlacedTiles((draft) => {
+        draft[coord] = type;
+      });
+    },
+    []
+  );
 
   const resetPlacement = useCallback(() => {
     setPlacedTiles(placement);

@@ -1,22 +1,15 @@
-import {
-  Box,
-  Button,
-  Container,
-  Stack,
-  Title,
-  useMantineTheme
-} from '@mantine/core';
+import { Box, Button, Container, Title, useMantineTheme } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { useState } from 'react';
 import { Hex, HexUtils } from 'react-hexgrid';
 import { useCopyToClipboard } from 'react-use';
 import { Board } from './Board';
 import { GridIcon } from './components/GridIcon';
-import { MantineIcon } from './components/MantineIcon';
 import { Tile } from './components/Tile';
 import { useCoords } from './hooks/use-coords';
 import { usePlacedTiles } from './hooks/use-placed-tiles';
 import { Rune } from './Rune.enum';
+import { TileBreakdown } from './TileBreakdown';
 import { hasOpposingNeighbours, hasTripleSplitNeighbours } from './util';
 
 const { getID } = HexUtils;
@@ -51,10 +44,16 @@ export const GameLogic = () => {
         return;
       }
 
-      const selectedType = getTileType(hex);
-
       if (selectedTile === hexId) {
         setSelectedTile('');
+        return;
+      }
+
+      const selectedType = getTileType(selectedTile);
+      const currentType = getTileType(hexId);
+
+      if (selectedType !== currentType) {
+        setSelectedTile(hexId);
         return;
       }
 
@@ -205,26 +204,7 @@ export const GameLogic = () => {
             );
           })}
         </Board>
-        <Stack sx={{ padding: 4 }}>
-          {Object.values(Rune).map((rune, index) => (
-            <Box
-              key={index}
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: '60px',
-                background: 'white',
-                borderRadius: '40px'
-              }}
-            >
-              <MantineIcon rune={rune} />
-              <Title order={4} color="black" sx={{ paddingRight: 8 }}>
-                1
-              </Title>
-            </Box>
-          ))}
-        </Stack>
+        <TileBreakdown placedTiles={placedTiles} />
       </Box>
     </Container>
   );
