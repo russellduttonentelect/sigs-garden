@@ -7,13 +7,17 @@ import {
   useMantineTheme
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
+import { useState } from 'react';
 import { Hex, HexUtils } from 'react-hexgrid';
 import { useCopyToClipboard } from 'react-use';
 import { Board } from './Board';
+import { GridIcon } from './components/GridIcon';
 import { Tile } from './components/Tile';
 import { useCoords } from './hooks/use-coords';
 import { usePlacedTiles } from './hooks/use-placed-tiles';
 import { Rune } from './Rune.enum';
+import { TileBreakdown } from './TileBreakdown';
+import { Placement } from './types/placement.type';
 import { hasOpposingNeighbours, hasTripleSplitNeighbours } from './util';
 
 const { getID } = HexUtils;
@@ -27,9 +31,10 @@ const RADIUS = 5;
 
 export const Builder = () => {
   const { classes } = useStyles();
-  const { pattern1, pattern2 } = useCoords();
+  const { pattern3 } = useCoords();
   const [, copyToClipboard] = useCopyToClipboard();
   const theme = useMantineTheme();
+  const [selectedType, setSelectedType] = useState<Placement[number]>('');
 
   const {
     placedTiles,
@@ -37,15 +42,17 @@ export const Builder = () => {
     deleteTile,
     resetPlacement,
     clearPlacement,
-    getTileType
-  } = usePlacedTiles();
+    getTileType,
+    coordToHex,
+    getTileFill
+  } = usePlacedTiles(pattern3);
 
   const selectTile = (hex: Hex) => {
     const hexId = getID(hex);
     if (placedTiles.hasOwnProperty(hexId)) {
       deleteTile(hexId);
     } else {
-      addTile(hexId, '');
+      addTile(hexId, selectedType);
     }
   };
 
@@ -79,48 +86,12 @@ export const Builder = () => {
     return containsTile;
   };
 
-  const getTileFill = (hex: Hex) => {
-    const tile = getTileType(hex);
-    switch (tile) {
-      case Rune.Air:
-        return theme.colors.indigo[5];
-      case Rune.Water:
-        return theme.colors.blue[5];
-      case Rune.Fire:
-        return theme.colors.red[5];
-      case Rune.Earth:
-        return theme.colors.lime[5];
-      case Rune.Elemental:
-        return '#B88';
-      case Rune.Light:
-        return '#ffffaa';
-      case Rune.Shadow:
-        return '#333';
-      case Rune.Quicksilver:
-        return '#597e8d';
-      case Rune.Magnesium:
-        return '#9a9ea3';
-      case Rune.Iron:
-        return '#625e59';
-      case Rune.Copper:
-        return '#B77333';
-      case Rune.Zinc:
-        return '#4c4c49';
-      case Rune.Platinum:
-        return '#95978e';
-      case Rune.Titanium:
-        return '#95978e';
-      default:
-        return '#666';
-    }
-  };
-
   const copyCoords = () => {
     const copyText =
       '{' +
       Object.entries(placedTiles).reduce((output, [key, value]) => {
         const coords = key.split(',');
-        return `${output}[createCoord(${coords[0]}, ${coords[1]})]: "${value}",`;
+        return `${output}[createCoord(${coords[0]}, ${coords[1]})]: Rune.${value},`;
       }, '') +
       '}';
 
@@ -185,6 +156,22 @@ export const Builder = () => {
               fill={getTileFill(hex)}
             />
           )}
+        >
+          {Object.keys(placedTiles).map((coord) => {
+            const hex = coordToHex(coord);
+            return (
+              <GridIcon
+                onClick={() => selectTile(hex)}
+                rune={getTileType(coord) as Rune}
+                size={6}
+                hex={hex}
+              />
+            );
+          })}
+        </Board>
+        <TileBreakdown
+          placedTiles={placedTiles}
+          onTileClick={setSelectedType}
         />
       </Box>
     </Container>

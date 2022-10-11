@@ -1,4 +1,4 @@
-import { Box, Button, Container, Title, useMantineTheme } from '@mantine/core';
+import { Box, Button, Container, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { useState } from 'react';
 import { Hex, HexUtils } from 'react-hexgrid';
@@ -18,9 +18,8 @@ const RADIUS = 5;
 
 export const GameLogic = () => {
   const [selectedTile, setSelectedTile] = useState('');
-  const { pattern1, pattern2 } = useCoords();
+  const { pattern3: coords } = useCoords();
   const [, copyToClipboard] = useCopyToClipboard();
-  const theme = useMantineTheme();
 
   const {
     placedTiles,
@@ -28,8 +27,9 @@ export const GameLogic = () => {
     resetPlacement,
     clearPlacement,
     getTileType,
-    coordToHex
-  } = usePlacedTiles(pattern2);
+    coordToHex,
+    getTileFill
+  } = usePlacedTiles(coords);
 
   const selectTile = (hex: Hex) => {
     if (isEdge(hex)) {
@@ -91,42 +91,6 @@ export const GameLogic = () => {
     }
 
     return containsTile;
-  };
-
-  const getTileFill = (hex: Hex) => {
-    const tile = getTileType(hex);
-    switch (tile) {
-      case Rune.Air:
-        return theme.colors.indigo[5];
-      case Rune.Water:
-        return theme.colors.blue[5];
-      case Rune.Fire:
-        return theme.colors.red[5];
-      case Rune.Earth:
-        return theme.colors.lime[5];
-      case Rune.Elemental:
-        return '#B88';
-      case Rune.Light:
-        return '#ffffaa';
-      case Rune.Shadow:
-        return '#333';
-      case Rune.Quicksilver:
-        return '#597e8d';
-      case Rune.Magnesium:
-        return '#9a9ea3';
-      case Rune.Iron:
-        return '#625e59';
-      case Rune.Copper:
-        return '#B77333';
-      case Rune.Zinc:
-        return '#4c4c49';
-      case Rune.Platinum:
-        return '#95978e';
-      case Rune.Titanium:
-        return '#95978e';
-      default:
-        return '#666';
-    }
   };
 
   const copyCoords = () => {
