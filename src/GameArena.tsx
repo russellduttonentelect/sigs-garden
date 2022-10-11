@@ -10,13 +10,12 @@ import { useCoords } from './hooks/use-coords';
 import { usePlacedTiles } from './hooks/use-placed-tiles';
 import { Rune } from './Rune.enum';
 import { TileBreakdown } from './TileBreakdown';
-import { hasOpposingNeighbours, hasTripleSplitNeighbours } from './util';
 
 const { getID } = HexUtils;
 
 const RADIUS = 5;
 
-export const GameLogic = () => {
+export const GameArena = () => {
   const [selectedTile, setSelectedTile] = useState('');
   const { pattern3: coords } = useCoords();
   const [, copyToClipboard] = useCopyToClipboard();
@@ -28,7 +27,8 @@ export const GameLogic = () => {
     clearPlacement,
     getTileType,
     coordToHex,
-    getTileFill
+    getTileFill,
+    isEdge
   } = usePlacedTiles(coords);
 
   const selectTile = (hex: Hex) => {
@@ -61,36 +61,6 @@ export const GameLogic = () => {
       deleteTile(hexId);
       setSelectedTile('');
     }
-  };
-
-  const isEdge = (hex: Hex) => {
-    const id = getID(hex);
-    const containsTile = placedTiles.hasOwnProperty(id);
-
-    const neighbourCoords = HexUtils.neighbors(hex);
-    const filledNeighbours = neighbourCoords.filter((hex) =>
-      placedTiles.hasOwnProperty(getID(hex))
-    );
-    const openNeighbours = neighbourCoords.filter(
-      (hex) => !placedTiles.hasOwnProperty(getID(hex))
-    );
-
-    if (openNeighbours.length < 3) {
-      return false;
-    }
-    if (openNeighbours.length < 5) {
-      const filledSet = new Set(
-        filledNeighbours.map((neighbour) => getID(neighbour))
-      );
-      if (
-        hasOpposingNeighbours(filledSet, hex) ||
-        hasTripleSplitNeighbours(filledSet, hex)
-      ) {
-        return false;
-      }
-    }
-
-    return containsTile;
   };
 
   const copyCoords = () => {

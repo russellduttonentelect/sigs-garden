@@ -1,7 +1,7 @@
-import { Box, Center, Container, SegmentedControl, Space } from '@mantine/core';
+import { Box, Container, SegmentedControl, Space } from '@mantine/core';
 import { useState } from 'react';
 import { Builder } from './Builder';
-import { GameLogic } from './GameLogic';
+import { GameArena } from './GameArena';
 
 export const GameContainer = () => {
   const [mode, setMode] = useState('Game');
@@ -33,7 +33,7 @@ export const GameContainer = () => {
         />
       </Box>
       <Space h="md" />
-      {mode === 'Game' ? <GameLogic /> : <Builder />}
+      {mode === 'Game' ? <GameArena /> : <Builder />}
     </Container>
   );
 };

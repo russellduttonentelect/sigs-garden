@@ -4,6 +4,18 @@ import { Hex, HexUtils } from 'react-hexgrid';
 import { useImmer } from 'use-immer';
 import { Rune } from '../Rune.enum';
 import { Placement } from '../types/placement.type';
+import { hasOpposingNeighbours, hasTripleSplitNeighbours } from '../util';
+
+const { getID } = HexUtils;
+
+const metalProgression = [
+  Rune.Magnesium,
+  Rune.Iron,
+  Rune.Copper,
+  Rune.Zinc,
+  Rune.Platinum,
+  Rune.Titanium
+];
 
 export const usePlacedTiles = (placement: Placement = {}) => {
   const [placedTiles, setPlacedTiles] = useImmer(placement);
@@ -85,6 +97,56 @@ export const usePlacedTiles = (placement: Placement = {}) => {
     }
   };
 
+  const isNextMetalProgression = (hex: string | Hex) => {
+    const hexId = typeof hex === 'string' ? hex : getID(hex);
+
+    const entries = Object.entries(placedTiles);
+
+    for (let metal of metalProgression) {
+      const placement = entries.find((entry) => entry[1] === metal);
+      if (placement && placement[0] === hexId) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const isEdge = (hex: Hex) => {
+    const id = getID(hex);
+    const containsTile = placedTiles.hasOwnProperty(id);
+    const tileType = placedTiles[id];
+
+    const neighbourCoords = HexUtils.neighbors(hex);
+    const filledNeighbours = neighbourCoords.filter((hex) =>
+      placedTiles.hasOwnProperty(getID(hex))
+    );
+    const openNeighbours = neighbourCoords.filter(
+      (hex) => !placedTiles.hasOwnProperty(getID(hex))
+    );
+
+    if (openNeighbours.length < 3) {
+      return false;
+    }
+    if (openNeighbours.length < 5) {
+      const filledSet = new Set(
+        filledNeighbours.map((neighbour) => getID(neighbour))
+      );
+      if (
+        hasOpposingNeighbours(filledSet, hex) ||
+        hasTripleSplitNeighbours(filledSet, hex)
+      ) {
+        return false;
+      }
+    }
+
+    if (tileType && metalProgression.includes(tileType)) {
+      return containsTile && isNextMetalProgression(id);
+    }
+
+    return containsTile;
+  };
+
   return {
     placedTiles,
     addTile,
@@ -93,6 +155,7 @@ export const usePlacedTiles = (placement: Placement = {}) => {
     clearPlacement,
     getTileType,
     coordToHex,
-    getTileFill
+    getTileFill,
+    isEdge
   };
 };

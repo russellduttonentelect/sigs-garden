@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  Container,
-  createStyles,
-  Title,
-  useMantineTheme
-} from '@mantine/core';
+import { Box, Button, Container, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { useState } from 'react';
 import { Hex, HexUtils } from 'react-hexgrid';
@@ -18,22 +11,14 @@ import { usePlacedTiles } from './hooks/use-placed-tiles';
 import { Rune } from './Rune.enum';
 import { TileBreakdown } from './TileBreakdown';
 import { Placement } from './types/placement.type';
-import { hasOpposingNeighbours, hasTripleSplitNeighbours } from './util';
 
 const { getID } = HexUtils;
-const useStyles = createStyles(() => ({
-  grid: {
-    rotate: '90deg'
-  }
-}));
 
 const RADIUS = 5;
 
 export const Builder = () => {
-  const { classes } = useStyles();
   const { pattern3 } = useCoords();
   const [, copyToClipboard] = useCopyToClipboard();
-  const theme = useMantineTheme();
   const [selectedType, setSelectedType] = useState<Placement[number]>('');
 
   const {
@@ -44,7 +29,8 @@ export const Builder = () => {
     clearPlacement,
     getTileType,
     coordToHex,
-    getTileFill
+    getTileFill,
+    isEdge
   } = usePlacedTiles(pattern3);
 
   const selectTile = (hex: Hex) => {
@@ -54,36 +40,6 @@ export const Builder = () => {
     } else {
       addTile(hexId, selectedType);
     }
-  };
-
-  const isEdge = (hex: Hex) => {
-    const id = getID(hex);
-    const containsTile = placedTiles.hasOwnProperty(id);
-
-    const neighbourCoords = HexUtils.neighbors(hex);
-    const filledNeighbours = neighbourCoords.filter((hex) =>
-      placedTiles.hasOwnProperty(getID(hex))
-    );
-    const openNeighbours = neighbourCoords.filter(
-      (hex) => !placedTiles.hasOwnProperty(getID(hex))
-    );
-
-    if (openNeighbours.length < 3) {
-      return false;
-    }
-    if (openNeighbours.length < 5) {
-      const filledSet = new Set(
-        filledNeighbours.map((neighbour) => getID(neighbour))
-      );
-      if (
-        hasOpposingNeighbours(filledSet, hex) ||
-        hasTripleSplitNeighbours(filledSet, hex)
-      ) {
-        return false;
-      }
-    }
-
-    return containsTile;
   };
 
   const copyCoords = () => {
