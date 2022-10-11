@@ -19,7 +19,7 @@ const RADIUS = 5;
 export const Builder = () => {
   const { pattern3 } = useCoords();
   const [, copyToClipboard] = useCopyToClipboard();
-  const [selectedType, setSelectedType] = useState<Placement[number]>('');
+  const [selectedType, setSelectedType] = useState<Placement[number]>();
 
   const {
     placedTiles,
@@ -37,8 +37,14 @@ export const Builder = () => {
     const hexId = getID(hex);
     if (placedTiles.hasOwnProperty(hexId)) {
       deleteTile(hexId);
-    } else {
+    } else if (!!selectedType) {
       addTile(hexId, selectedType);
+    } else {
+      showNotification({
+        message: 'Select a tile to place',
+        autoClose: 3000,
+        color: 'orange'
+      });
     }
   };
 
