@@ -48,10 +48,6 @@ export const usePlacedTiles = (placement: Placement = {}) => {
 
   const getTileType = (hex: Hex | string) => {
     const lookup = typeof hex === 'string' ? hex : HexUtils.getID(hex);
-    if (!placedTiles.hasOwnProperty(lookup)) {
-      return '';
-    }
-
     return placedTiles[lookup];
   };
 
@@ -99,17 +95,17 @@ export const usePlacedTiles = (placement: Placement = {}) => {
 
   const isNextMetalProgression = (hex: string | Hex) => {
     const hexId = typeof hex === 'string' ? hex : getID(hex);
+    const tileType = placedTiles[hexId];
 
-    const entries = Object.entries(placedTiles);
+    const remainingMetals = Object.values(placedTiles).filter((entry) =>
+      metalProgression.includes(entry)
+    );
 
-    for (let metal of metalProgression) {
-      const placement = entries.find((entry) => entry[1] === metal);
-      if (placement && placement[0] === hexId) {
-        return true;
-      }
-    }
+    const nextMetal = metalProgression.find((metal) =>
+      remainingMetals.includes(metal)
+    );
 
-    return false;
+    return nextMetal === tileType;
   };
 
   const isEdge = (hex: Hex) => {
@@ -141,7 +137,9 @@ export const usePlacedTiles = (placement: Placement = {}) => {
     }
 
     if (tileType && metalProgression.includes(tileType)) {
-      return containsTile && isNextMetalProgression(id);
+      console.log('Check metal progression');
+      const isNextProgression = isNextMetalProgression(id);
+      return containsTile && isNextProgression;
     }
 
     return containsTile;
@@ -156,6 +154,7 @@ export const usePlacedTiles = (placement: Placement = {}) => {
     getTileType,
     coordToHex,
     getTileFill,
-    isEdge
+    isEdge,
+    isNextMetalProgression
   };
 };

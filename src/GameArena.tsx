@@ -6,6 +6,12 @@ import { useCopyToClipboard } from 'react-use';
 import { Board } from './Board';
 import { GridIcon } from './components/GridIcon';
 import { Tile } from './components/Tile';
+import {
+  isBaseElementMatch,
+  isElementalMatch,
+  isLightShadowMatch,
+  isMetalMatch
+} from './game-logic';
 import { useCoords } from './hooks/use-coords';
 import { usePlacedTiles } from './hooks/use-placed-tiles';
 import { Rune } from './Rune.enum';
@@ -16,7 +22,7 @@ const { getID } = HexUtils;
 const RADIUS = 5;
 
 export const GameArena = () => {
-  const [selectedTile, setSelectedTile] = useState('');
+  const [activeTile, setActiveTile] = useState('');
   const { pattern3: coords } = useCoords();
   const [, copyToClipboard] = useCopyToClipboard();
 
@@ -28,38 +34,51 @@ export const GameArena = () => {
     getTileType,
     coordToHex,
     getTileFill,
-    isEdge
+    isEdge,
+    isNextMetalProgression
   } = usePlacedTiles(coords);
 
   const selectTile = (hex: Hex) => {
     if (isEdge(hex)) {
       const hexId = getID(hex);
-      if (!selectedTile) {
-        if (hexId === getID(new Hex(0, 0, 0))) {
+      if (!activeTile) {
+        if (
+          hexId === getID(new Hex(0, 0, 0)) &&
+          isNextMetalProgression(hexId)
+        ) {
           deleteTile(hexId);
           return;
         }
 
-        setSelectedTile(hexId);
+        setActiveTile(hexId);
         return;
       }
 
-      if (selectedTile === hexId) {
-        setSelectedTile('');
+      if (activeTile === hexId) {
+        setActiveTile('');
         return;
       }
 
-      const selectedType = getTileType(selectedTile);
-      const currentType = getTileType(hexId);
+      const activeType = getTileType(activeTile);
+      const selectedType = getTileType(hexId);
 
-      if (selectedType !== currentType) {
-        setSelectedTile(hexId);
+      const shouldCancelOut =
+        isLightShadowMatch(activeType, selectedType) ||
+        isBaseElementMatch(activeType, selectedType) ||
+        isElementalMatch(activeType, selectedType) ||
+        (isMetalMatch(activeType, selectedType) &&
+          (isNextMetalProgression(activeTile) ||
+            isNextMetalProgression(hexId)));
+
+      if (shouldCancelOut) {
+        deleteTile(activeTile);
+        deleteTile(hexId);
+        setActiveTile('');
         return;
       }
 
-      deleteTile(selectedTile);
-      deleteTile(hexId);
-      setSelectedTile('');
+      setActiveTile(hexId);
+      return;
     }
   };
 
@@ -119,7 +138,7 @@ export const GameArena = () => {
               hex={hex}
               key={HexUtils.getID(hex)}
               containsTile={placedTiles.hasOwnProperty(getID(hex))}
-              isSelected={getID(hex) === selectedTile}
+              isSelected={getID(hex) === activeTile}
               selectTile={selectTile}
               isEdge={isEdge(hex)}
               fill={getTileFill(hex)}
