@@ -1,5 +1,6 @@
 import { ThemeIcon } from '@mantine/core';
 import { get } from 'lodash';
+import React from 'react';
 import { Rune } from '../Rune.enum';
 import { RuneIcon } from './RuneIcon';
 
@@ -7,7 +8,7 @@ type MantineIconProps = {
   rune: Rune;
 };
 
-export const MantineIcon = ({ rune }: MantineIconProps) => {
+export const MantineIcon = React.memo(({ rune }: MantineIconProps) => {
   const gradientLookup = {
     [Rune.Earth]: { from: 'green', to: '#82c91e' },
     [Rune.Water]: { from: 'blue', to: 'cyan' },
@@ -35,4 +36,4 @@ export const MantineIcon = ({ rune }: MantineIconProps) => {
       <RuneIcon rune={rune} />
     </ThemeIcon>
   );
-};
+});

@@ -15,6 +15,7 @@ import {
   IconTallymarks
 } from '@tabler/icons';
 import { get } from 'lodash';
+import React from 'react';
 import { Rune } from '../Rune.enum';
 
 type RuneIconProps = {
@@ -22,7 +23,7 @@ type RuneIconProps = {
   size?: string | number;
 };
 
-export const RuneIcon = ({ rune, size }: RuneIconProps) => {
+export const RuneIcon = React.memo(({ rune, size }: RuneIconProps) => {
   const iconLookup = {
     [Rune.Earth]: <IconPlant size={size} filter="url(#shadow)" />,
     [Rune.Water]: <IconDroplet size={size} filter="url(#shadow)" />,
@@ -43,4 +44,4 @@ export const RuneIcon = ({ rune, size }: RuneIconProps) => {
   };
 
   return get(iconLookup, rune);
-};
+});
